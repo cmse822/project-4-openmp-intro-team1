@@ -17,15 +17,16 @@ void print_matrix(block_matrix_t mat) {
 // argv is an array of character pointers listing all the arguments
 int main(int argc, char **argv) {
 
+    if (argc != 5) {
+        perror("Wrong number of arguments! Please reenter.\n");
+        perror("Arguments:\nN_max N_min interval ouput_file");
+        return -1;
+    }
+
     const int repeat = 20; // Repeat the calculation to obtain the average flops/s
     const int N_max = atoi(argv[1]); // Second element of our input string, refers to the largest matrix size, required to be 1 to 10 million
     const int N_min = atoi(argv[2]); // Third element, refers to the smallest matrix size in computation
     const int interval = atoi(argv[3]); // atoi converts string to integer
-
-    if (argc != 5) {
-        perror("Wrong number of arguments! Please reenter.\n");
-        return -1;
-    }
 
     if (N_max < 1 || interval < 1) {
         perror("Matrix size or interval too small!\n");
