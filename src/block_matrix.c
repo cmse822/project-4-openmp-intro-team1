@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "block_matrix.h"
+#include "../include/block_matrix.h"
 
 void block_matrix_alloc(block_matrix_t *mat) {
 	mat->data = (float *)malloc(mat->rows * mat->cols * sizeof(float));

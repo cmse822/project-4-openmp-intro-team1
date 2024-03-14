@@ -1,17 +1,19 @@
 all: matmul
 
-matmul: main.o matrix.o block_matrix.o get_walltime.o
-	gcc main.o matrix.o block_matrix.o get_walltime.o -o matmul
+objects=src/main.o src/matrix.o src/block_matrix.o src/get_walltime.o
 
-main.o: main.c
-	gcc -c main.c -o main.o
+matmul: $(objects)
+	gcc $(objects) -o matmul
 
-matrix.o: matrix.c matrix.h
-	gcc -c matrix.c -o matrix.o
+src/main.o: src/main.c
+	gcc -c src/main.c -o src/main.o
 
-block_matrix.o: block_matrix.c block_matrix.h
-	gcc -c block_matrix.c -o block_matrix.o
+src/matrix.o: src/matrix.c include/matrix.h
+	gcc -c src/matrix.c -o src/matrix.o
 
-get_walltime.o: get_walltime.c 
-	gcc -c get_walltime.c -o get_walltime.o
+src/block_matrix.o: src/block_matrix.c include/block_matrix.h
+	gcc -c src/block_matrix.c -o src/block_matrix.o
+
+src/get_walltime.o: src/get_walltime.c 
+	gcc -c src/get_walltime.c -o src/get_walltime.o
 

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "matrix.h"
+#include "../include/matrix.h"
 
 void matrix_alloc(matrix_t *mat) {
 	mat->data = (float **)malloc(mat->rows * sizeof(float *));

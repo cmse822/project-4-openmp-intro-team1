@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "matrix.h"
-#include "block_matrix.h"
-#include "get_walltime.h"
+#include "../include/matrix.h"
+#include "../include/block_matrix.h"
+#include "../include/get_walltime.h"
 
 void print_matrix(block_matrix_t mat) {
 	for (int i = 0; i < mat.rows; i++) {
