@@ -26,5 +26,17 @@ void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c
 			}
 		}
 	}
-
 }
+
+void block_matrix_multiply_parallel(block_matrix_t a, block_matrix_t b, block_matrix_t *c) {
+	#pragma omp parallel shared(a, b, c) {
+		#pragma omp for
+		for (int i = 0; i < a.rows; i++) {
+			#pragma omp for
+			for (int j = 0; j < b.cols; j++) {
+				for (int k = 0; k < a.cols; k++) {
+					matrix_set(c, i, j, matrix_get(a, i, k) * matrix_get(b, k, j));
+				}
+			}
+		}
+	}

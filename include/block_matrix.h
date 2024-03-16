@@ -25,7 +25,6 @@ void fill_constant_block_matrix(block_matrix_t *mat, float value);
 // Fill a matrix with random entries between 0 and 1
 //void fill_random_block_matrix(block_matrix_t *mat);
 
-
-
 // Execute C = C + A * B
 void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c);
+void block_matrix_multiply_parallel(block_matrix_t a, block_matrix_t b, block_matrix_t *c);

@@ -33,10 +33,12 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    double start_time, end_time;
+    double start_time, end_time, end_time2;
     double total_time[N_max];
+    double total_time_parallel[N_max];
     double Gflop[N_max]; // Total number of floating point operations
     double performance[N_max]; // Performance time
+    double performance_parallel[N_max]; // Performance time for parallel multiply
     
     // Output N and performance arrays for plotting
     FILE *odata; // Output data
@@ -48,7 +50,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     
-    fprintf(odata, "%s, %s\n", "matrix size", "GFLOPS/s"); // Print header
+    fprintf(odata, "%s,%s,%s\n", "matrix size", "GFLOPS/s", "parallel_GFLOP/s"); // Print header
 
     for (int N = N_min; N <= N_max; N += interval) {
         
@@ -79,6 +81,12 @@ int main(int argc, char **argv) {
         
         get_walltime(&end_time);
 
+        for (int i = 0; i < repeat; i++) {
+            block_matrix_multiply_parallel(matA, matB, &matC);
+        }
+        
+        get_walltime(&end_time2);
+
         //print_matrix(matC);
         
         block_matrix_free(&matA);
@@ -87,11 +95,13 @@ int main(int argc, char **argv) {
         
         // Performance calculation, GFLOPS/s
         total_time[N-1] = (end_time - start_time) / repeat; // Average time of each repart
+        total_time_parallel[N-1] = (end_time2 - end_time) / repeat;
         Gflop[N-1] = (matA.rows * matB.cols * matA.cols +
                       matA.rows * matB.cols * (matA.cols - 1)) / 1000000000.0; // Change unit to GFLOPS
         performance[N-1] = Gflop[N-1] / total_time[N-1]; // Compute GFLOPS/s
+        performance_parallel[N-1] = Gflop[N-1] / total_time_parallel[N-1]; // Compute GFLOPS/s
         
-        fprintf(odata, "%d, %f\n", N, performance[N-1]);
+        fprintf(odata, "%d,%f,%f\n", N, performance[N-1], performance_parallel[N-1]);
     }
 
     fclose(odata);
