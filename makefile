@@ -1,6 +1,12 @@
-all: matmul
+all: matmul matmul_test
 
 objects=src/main.o src/matrix.o src/block_matrix.o src/get_walltime.o
+
+matmul_test: src/matmul_test.o src/matrix.o src/block_matrix.o
+	gcc src/matmul_test.o src/matrix.o src/block_matrix.o -o matmul_test
+
+src/matmul_test.o: src/matmul_test.c src/block_matrix.o include/block_matrix.h
+	gcc -c src/matmul_test.c -o src/matmul_test.o
 
 matmul: $(objects)
 	gcc $(objects) -o matmul

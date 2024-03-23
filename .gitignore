@@ -1,3 +1,4 @@
 *.o
 matmul
 *.csv
+matmul_test
