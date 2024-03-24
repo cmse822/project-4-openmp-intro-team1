@@ -9,7 +9,7 @@ src/matmul_test.o: src/matmul_test.c src/block_matrix.o include/block_matrix.h
 	gcc -c src/matmul_test.c -o src/matmul_test.o
 
 matmul: $(objects)
-	gcc $(objects) -o matmul -lm
+	mpicc $(objects) -o matmul -lm
 
 src/main.o: src/main.c
 	gcc -c src/main.c -o src/main.o
