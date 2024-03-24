@@ -34,6 +34,31 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	block_matrix_multiply(chunk_a, b, &chunk_c);
 
 	// Send all chunks to rank 0.
+	int send_counts_per_rank = chunk_c.rows * chunk_c.cols;
+	int *recv_elements_count = NULL;
+	int *displs = NULL;
+	float *gathered_chunk_c = NULL;
+
+	if (rank == 0) {
+    	recv_elements_count = (int *)malloc(world_size * sizeof(int));
+		displs = (int *)malloc(world_size * sizeof(int));
+	}
+
+	MPI_Gather(&send_counts_per_rank, 1, MPI_INT, recv_elements_count, 1, MPI_INT, 0, MPI_COMM_WORLD);
+
+	if (rank == 0) {
+		int displs_count = 0;
+		for (int i = 0; i < world_size; ++i) {
+			displs[i] = displs_count;
+			displs_count += recv_elements_count[i];
+		}
+
+		gathered_chunk_c = (float *)malloc(b.cols * a.rows * sizeof(float));
+	}
+
+	MPI_Gatherv(chunk_c.data, send_counts_per_rank, MPI_FLOAT, 
+				gathered_chunk_c, recv_elements_count, displs, MPI_FLOAT, 0, MPI_COMM_WORLD);
+	
 	// Assign these chunks to the elements of C.
 
 	block_matrix_free(&chunk_a);
