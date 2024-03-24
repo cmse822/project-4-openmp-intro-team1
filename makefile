@@ -25,3 +25,6 @@ src/get_walltime.o: src/get_walltime.c
 
 src/mpi_matrix_multiply.o: src/mpi_matrix_multiply.c include/mpi_matrix_multiply.h
 	gcc -c src/mpi_matrix_multiply.c -o src/mpi_matrix_multiply.o -lm
+
+clean:
+	rm -f src/matmul_test.o src/main.o src/matrix.o src/block_matrix.o src/get_walltime.o src/mpi_matrix_multiply.o 
