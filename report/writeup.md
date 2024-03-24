@@ -6,7 +6,8 @@
 
 ## Part 1 : OpenMP Matrix-Matrix Multiplication
 
-
+Q 2. As shown in the figure below, when we run the MMM program on `amd-20` using `export OMP_NUM_THREADS=1`, the time consumed is almost the same as that for serial computing of MMM. When the matrix size is very small, the error is more noticeable, but still less than 2%.
+<img src="./part1_1.png" alt="error" width="800"/>
 
 ## Part 2 : Adding OpenMP threading to a simple MPI application
 
