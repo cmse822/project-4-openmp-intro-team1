@@ -60,6 +60,19 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 				gathered_chunk_c, recv_elements_count, displs, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	
 	// Assign these chunks to the elements of C.
+	if (rank == 0) {
+		int proc = 0;
+		int row_in_chunk = 0;
+		int index = 0;
+		for (int i = 0; i < a.rows; ++i) {
+			for (int j = 0; j < b.cols; ++j) {
+				proc = i / rows_per_rank;
+				row_in_chunk = i % rows_per_rank;
+				index = displs[proc] + row_in_chunk * b.cols + j;
+				c->data[i * b.cols + j] = gathered_chunk_c[index];
+			}
+		}
+	}
 
 	block_matrix_free(&chunk_a);
 	block_matrix_free(&chunk_c);
