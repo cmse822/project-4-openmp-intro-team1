@@ -25,7 +25,7 @@ void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c
 			for (int k = 0; k < a.cols; k++) {
 				sum += matrix_get(a, i, k) * matrix_get(b, k, j);
 			}
-			matrix_set(c, i, j, sum);
+			matrix_set(c, i, j, sum); // this is the dot product
 		}
 	}
 }
