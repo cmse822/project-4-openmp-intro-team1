@@ -64,10 +64,10 @@ void write_matrix_to_csv(const char* filename, block_matrix_t mat) {
         for (size_t j = 0; j < mat.cols; j++) {
             fprintf(file, "%f", matrix_get(mat, i, j));
             if (j < mat.cols - 1) {
-                fprintf(file, ",");  // comma-separated
+                fprintf(file, ",");
             }
         }
-        fprintf(file, "\n");  // new line for each row
+        fprintf(file, "\n");  
     }
     
     fclose(file);
