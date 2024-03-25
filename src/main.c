@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/matrix.h"
@@ -17,7 +18,7 @@ void print_matrix(block_matrix_t mat) {
 // argv is an array of character pointers listing all the arguments
 int main(int argc, char **argv) {
 
-    if (argc != 5) {
+    if (argc != 6) {
         perror("Wrong number of arguments! Please reenter.\n");
         perror("Arguments:\nN_min N_max interval ouput_file");
         return -1;
@@ -33,7 +34,9 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    double start_time, end_time, end_time2;
+    const int num_threads = atoi(argv[5]);
+    char matrix_filename[256];
+    double start_time1, end_time1, start_time2, end_time2;
     double total_time[N_max];
     double total_time_parallel[N_max];
     double Gflop[N_max]; // Total number of floating point operations
@@ -73,19 +76,28 @@ int main(int argc, char **argv) {
         fill_constant_block_matrix(&matC, 0.0);
         
         // repeat matrix multiplication and measure the total computation time
-        get_walltime(&start_time);
-        
+        get_walltime(&start_time1);
         for (int i = 0; i < repeat; i++) {
             block_matrix_multiply(matA, matB, &matC);
         }
-        
-        get_walltime(&end_time);
+        get_walltime(&end_time1);
 
+        // Save the result of the serial multiplication
+        sprintf(matrix_filename, "../CSVs/matrix_outputs/serial_output_matrix_%d.csv", N);
+        write_matrix_to_csv(matrix_filename, matC);
+
+        fill_constant_block_matrix(&matC, 0.0);
+        omp_set_num_threads(num_threads);
+
+        get_walltime(&start_time2);
         for (int i = 0; i < repeat; i++) {
             block_matrix_multiply_parallel(matA, matB, &matC);
         }
-        
         get_walltime(&end_time2);
+
+        // Save the result of the parallel multiplication
+        sprintf(matrix_filename, "../CSVs/matrix_outputs/parallel_output_matrix_%d_%d.csv", N, num_threads);
+        write_matrix_to_csv(matrix_filename, matC);
 
         //print_matrix(matC);
         
@@ -94,8 +106,8 @@ int main(int argc, char **argv) {
         block_matrix_free(&matC);
         
         // Performance calculation, GFLOPS/s
-        total_time[N-1] = (end_time - start_time) / repeat; // Average time of each repart
-        total_time_parallel[N-1] = (end_time2 - end_time) / repeat;
+        total_time[N-1] = ((end_time2 - start_time2) + (end_time1 - start_time1)) / repeat; // Average time of each repart
+        total_time_parallel[N-1] = (end_time2 - start_time2) / repeat;
         Gflop[N-1] = (matA.rows * matB.cols * matA.cols +
                       matA.rows * matB.cols * (matA.cols - 1)) / 1000000000.0; // Change unit to GFLOPS
         performance[N-1] = Gflop[N-1] / total_time[N-1]; // Compute GFLOPS/s
