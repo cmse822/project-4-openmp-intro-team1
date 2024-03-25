@@ -18,10 +18,13 @@ void fill_constant_block_matrix(block_matrix_t *mat, float value) {
 	}
 }
 
+//
+// Replace previous nested loop with a single loop 
 void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c) {
 	for (int i = 0; i < a.rows; i++) {
 		for (int j = 0; j < b.cols; j++) {
 			float sum = 0.0;
+			
 			for (int k = 0; k < a.cols; k++) {
 				sum += matrix_get(a, i, k) * matrix_get(b, k, j);
 			}
@@ -37,6 +40,7 @@ void block_matrix_multiply_parallel(block_matrix_t a, block_matrix_t b, block_ma
 			#pragma omp for
 			for (int j = 0; j < b.cols; j++) {
 				float sum = 0.0;
+				
 				#pragma omp for reduction(+:sum)
 				for (int k = 0; k < a.cols; k++) {
 					sum += matrix_get(a, i, k) * matrix_get(b, k, j);
