@@ -1,5 +1,7 @@
 CFLAGS=-fopenmp
 
+LDFLAGS=-fopenmp
+
 all: matmul matmul_test
 
 objects=src/main.o src/matrix.o src/block_matrix.o src/get_walltime.o src/mpi_matrix_multiply.o
