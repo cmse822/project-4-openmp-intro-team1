@@ -2,4 +2,5 @@
 matmul
 *.csv
 matmul_test
+mpi_matmul_test
 hello_omp

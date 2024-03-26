@@ -44,7 +44,7 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 		displs = (int *)malloc(world_size * sizeof(int));
 	}
 
-	MPI_Gather(&send_counts_per_rank, 1, MPI_INT, recv_elements_count, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	MPI_Gather(&send_counts_per_rank, 1, MPI_INT, recv_elements_count, world_size, MPI_INT, 0, MPI_COMM_WORLD);
 
 	if (rank == 0) {
 		int displs_count = 0;
