@@ -1,3 +1,6 @@
+#ifndef BLOCKMAT
+#define BLOCKMAT
+
 // Get the i, j element of a matrix mat.
 // here we use macro instead of function
 #define matrix_get(mat, i, j) (mat.data[i * mat.cols + j])
@@ -28,3 +31,5 @@ void fill_constant_block_matrix(block_matrix_t *mat, float value);
 // Execute C = C + A * B
 void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c);
 void block_matrix_multiply_parallel(block_matrix_t a, block_matrix_t b, block_matrix_t *c);
+
+#endif
