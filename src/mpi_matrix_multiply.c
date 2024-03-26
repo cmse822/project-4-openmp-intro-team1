@@ -39,7 +39,7 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	// Multiply the chunk of A by all of B.
 	block_matrix_multiply(chunk_a, b, &chunk_c);
 	printf("Finished multiply\n");
-	exit(-1);
+	//exit(-1);
 
 	// Send all chunks to rank 0.
 	int send_counts_per_rank = chunk_c.rows * chunk_c.cols;
