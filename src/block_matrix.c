@@ -29,14 +29,11 @@ void block_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c
         int i = idx / k; // row index for 'c'.
         int j = idx % k; // col index for 'c'.
         float sum = 0.0;
-		//printf("row index of c is: %d \n",i);
-		//printf("col index of c is: %d \n",j);
 
         // Compute the dot product to get the element c[i][j].
         for (int p = 0; p < n; p++) {
             sum += matrix_get(a, i, p) * matrix_get(b, p, j);
         }
-		//printf("row %d, col %d entry of c is: %f \n", i, j, sum);
         matrix_set(c, i, j, sum);
     }
 }
