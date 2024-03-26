@@ -1,6 +1,7 @@
 #include <mpi.h>
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "../include/block_matrix.h"
 
 void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, int rank, int world_size){
@@ -13,17 +14,22 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	this_node_row_min = rank * rows_per_rank;
 	this_node_row_max = (rank + 1) * rows_per_rank - 1;
 	if (this_node_row_max > a.rows) this_node_row_max = a.rows;
+	printf("%d %d %d\n", rank, this_node_row_min, this_node_row_max);
 	
 	// Store a chunk of A in a separate matrix.
 	block_matrix_t chunk_a;
 	chunk_a.rows = this_node_row_max - this_node_row_min + 1;
 	chunk_a.cols = a.cols;
 	block_matrix_alloc(&chunk_a);
+	int i_local = 0;
 	for (int i = this_node_row_min; i <= this_node_row_max; i++) {
 		for (int j = 0; j < chunk_a.cols; j++) {
-			matrix_set((&chunk_a), i, j, matrix_get(a, i, j));
+			matrix_set((&chunk_a), i_local, j, matrix_get(a, i, j));
 		}
+		i_local++;
 	}
+	MPI_Barrier(MPI_COMM_WORLD);
+	printf("Finished allocation\n");
 
 	// Make a chunk of C to store the partial multiplication result.
 	block_matrix_t chunk_c;
@@ -32,6 +38,8 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	block_matrix_alloc(&chunk_c);
 	// Multiply the chunk of A by all of B.
 	block_matrix_multiply(chunk_a, b, &chunk_c);
+	printf("Finished multiply\n");
+	exit(-1);
 
 	// Send all chunks to rank 0.
 	int send_counts_per_rank = chunk_c.rows * chunk_c.cols;

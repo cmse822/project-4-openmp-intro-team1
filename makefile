@@ -1,5 +1,5 @@
 # Define the standard C compiler and MPI compiler
-CC=gcc
+CC=mpicc
 MPICC=mpicc
 # Compiler flags, enable OpenMP
 CFLAGS=-fopenmp
@@ -7,7 +7,7 @@ CFLAGS=-fopenmp
 LDFLAGS=-lm -fopenmp
 
 ### Default Target: build matmul and matmul_test programs
-all: matmul matmul_test
+all: matmul matmul_test mpi_matmul_test
 
 # List of object files needed to build the targets
 objects=src/main.o src/matrix.o src/block_matrix.o src/get_walltime.o src/mpi_matrix_multiply.o
@@ -18,6 +18,12 @@ matmul_test: src/matmul_test.o src/matrix.o src/block_matrix.o
 
 src/matmul_test.o: src/matmul_test.c include/block_matrix.h
 	$(CC) $(CFLAGS) -c src/matmul_test.c -o src/matmul_test.o
+
+mpi_matmul_test: src/mpi_matmul_test.o src/matrix.o src/block_matrix.o
+	$(CC) $(LDFLAGS) src/mpi_matrix_multiply.o src/mpi_matmul_test.o src/matrix.o src/block_matrix.o -o mpi_matmul_test
+
+src/mpi_matmul_test.o: src/mpi_matmul_test.c include/block_matrix.h
+	$(CC) $(CFLAGS) -c src/mpi_matmul_test.c -o src/mpi_matmul_test.o
 
 ### Target to build the matmul executable, which likely requires MPI for parallel distributed computing
 matmul: $(objects)
