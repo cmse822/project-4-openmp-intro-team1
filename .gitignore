@@ -2,3 +2,4 @@
 matmul
 *.csv
 matmul_test
+hello_omp
