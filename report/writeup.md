@@ -12,6 +12,9 @@ As shown in the figure below, when we run the MMM program on `amd-20` using `exp
 
 ### Q3 
 In `AMD-20`, using the `nproc` command to query the maximum number of processes is `128`, so T=128.
+The results of MMM in size `N=20,100,1000` under multiple OMP threads are shown in the figure below. As the number of threads doubles, the time taken for matrix multiplication also decreases exponentially, until the number of threads exceeds the matrix size. When the number of threads is greater than the size of the matrix, increasing the number of threads actually increases the computation time.
+<img src="./part1_2.png" alt="error" width="800"/>
+
 
 
 
