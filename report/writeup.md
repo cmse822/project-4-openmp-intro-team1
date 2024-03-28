@@ -10,10 +10,13 @@
 As shown in the figure below, when we run the MMM program on `amd-20` using `export OMP_NUM_THREADS=1`, the time consumed is almost the same as that for serial computing of MMM. When the matrix size is very small, the error is more noticeable, but still less than 3%. The reason for the minor discrepancies is that running OMP code also requires time, but as the scale of computation increases, the proportion of this time becomes smaller and smaller.
 <img src="./part1_1.png" alt="error" width="800"/>
 
-### Q3 
+### Q3 & Q4
 In `AMD-20`, using the `nproc` command to query the maximum number of processes is `128`, so T=128.
 The results of MMM in size `N=20,100,1000` under multiple OMP threads are shown in the figure below. As the number of threads doubles, the time taken for matrix multiplication also decreases exponentially, until the number of threads exceeds the matrix size. When the number of threads is greater than the size of the matrix, increasing the number of threads actually increases the computation time.
 <img src="./part1_2.png" alt="error" width="800"/>
+
+### Q5
+We attempted to compare the computation results under different thread counts `T=1, 2, 4, 8...128` with the serial computation results and found them to be identical. This means that our program has good consistency and no conflicts when sharing data and reading. For specific verification code, please refer to `/src/matmul_solution_verification.c`.
 
 
 
