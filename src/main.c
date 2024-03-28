@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpi.h>
 #include "../include/matrix.h"
 #include "../include/block_matrix.h"
 #include "../include/get_walltime.h"
+#include "../include/mpi_matrix_multiply.h"
 
 void print_matrix(block_matrix_t mat) {
 	for (int i = 0; i < mat.rows; i++) {
@@ -17,9 +19,16 @@ void print_matrix(block_matrix_t mat) {
 // argv is an array of character pointers listing all the arguments
 int main(int argc, char **argv) {
 
+	MPI_Init(&argc, &argv);
+
+	int rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+	int world_size;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+
     if (argc != 5) {
         perror("Wrong number of arguments! Please reenter.\n");
-        perror("Arguments:\nN_min N_max interval ouput_file");
+        perror("Arguments:\nN_min N_max interval ouput_file\n");
         return -1;
     }
 
@@ -33,12 +42,14 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    double start_time, end_time, end_time2;
+    double start_time, end_time, end_time2, end_time3;
     double total_time[N_max];
     double total_time_parallel[N_max];
+	double total_time_mpi[N_max];
     double Gflop[N_max]; // Total number of floating point operations
     double performance[N_max]; // Performance time
     double performance_parallel[N_max]; // Performance time for parallel multiply
+	double performance_mpi[N_max]; // Performance for MPI multiply
     
     // Output N and performance arrays for plotting
     FILE *odata; // Output data
@@ -50,7 +61,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     
-    fprintf(odata, "%s,%s,%s\n", "matrix size", "GFLOPS/s", "parallel_GFLOP/s"); // Print header
+    fprintf(odata, "%s,%s,%s\n", "matrix size", "GFLOPS/s", "parallel_GFLOP/s", "mpi_GFLOP/s"); // Print header
 
     for (int N = N_min; N <= N_max; N += interval) {
         
@@ -87,6 +98,12 @@ int main(int argc, char **argv) {
         
         get_walltime(&end_time2);
 
+        for (int i = 0; i < repeat; i++) {
+            mpi_matrix_multiply(matA, matB, &matC, rank, world_size);
+        }
+        
+        get_walltime(&end_time3);
+
         //print_matrix(matC);
         
         block_matrix_free(&matA);
@@ -96,15 +113,19 @@ int main(int argc, char **argv) {
         // Performance calculation, GFLOPS/s
         total_time[N-1] = (end_time - start_time) / repeat; // Average time of each repart
         total_time_parallel[N-1] = (end_time2 - end_time) / repeat;
+        total_time_mpi[N-1] = (end_time3 - end_time2) / repeat;
         Gflop[N-1] = (matA.rows * matB.cols * matA.cols +
                       matA.rows * matB.cols * (matA.cols - 1)) / 1000000000.0; // Change unit to GFLOPS
         performance[N-1] = Gflop[N-1] / total_time[N-1]; // Compute GFLOPS/s
         performance_parallel[N-1] = Gflop[N-1] / total_time_parallel[N-1]; // Compute GFLOPS/s
+        performance_mpi[N-1] = Gflop[N-1] / total_time_mpi[N-1]; // Compute GFLOPS/s
         
-        fprintf(odata, "%d,%f,%f\n", N, performance[N-1], performance_parallel[N-1]);
+        fprintf(odata, "%d,%f,%f,%f\n", N, performance[N-1], performance_parallel[N-1], performance_mpi[N-1]);
     }
 
     fclose(odata);
-    
+   	
+	MPI_Finalize();
+ 
     return 0;
 }
