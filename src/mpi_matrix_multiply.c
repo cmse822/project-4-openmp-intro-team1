@@ -13,7 +13,7 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	rows_per_rank = (int)ceil((double)a.rows / (double)world_size);
 	this_node_row_min = rank * rows_per_rank;
 	this_node_row_max = (rank + 1) * rows_per_rank - 1;
-	if (this_node_row_max > a.rows) this_node_row_max = a.rows;
+	if (this_node_row_max >= a.rows) this_node_row_max = a.rows - 1;
 	//printf("%d %d %d\n", rank, this_node_row_min, this_node_row_max);
 	
 	// Store a chunk of A in a separate matrix.
@@ -42,46 +42,52 @@ void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, 
 	//exit(-1);
 
 	// Send all chunks to rank 0.
-	int send_counts_per_rank = chunk_c.rows * chunk_c.cols;
 	int *recv_elements_count = NULL;
 	int *displs = NULL;
-	float *gathered_chunk_c = NULL;
+
 
 	if (rank == 0) {
     	recv_elements_count = (int *)malloc(world_size * sizeof(int));
 		displs = (int *)malloc(world_size * sizeof(int));
 	}
-
-	MPI_Gather(&send_counts_per_rank, 1, MPI_INT, recv_elements_count, world_size, MPI_INT, 0, MPI_COMM_WORLD);
+	
+	int chunk_c_elements = chunk_c.rows * chunk_c.cols;
+	MPI_Gather(&chunk_c_elements, 1, MPI_INT, recv_elements_count, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
 	if (rank == 0) {
-		int displs_count = 0;
+		displs = (int *)malloc(world_size * sizeof(int));
+		displs[0] = 0;
 		for (int i = 0; i < world_size; ++i) {
-			displs[i] = displs_count;
-			displs_count += recv_elements_count[i];
+			displs[i] = displs[i-1] + recv_elements_count[i-1];
 		}
+	}
 
+	float *gathered_chunk_c = NULL;
+	if (rank == 0) {
 		gathered_chunk_c = (float *)malloc(b.cols * a.rows * sizeof(float));
 	}
 
-	MPI_Gatherv(chunk_c.data, send_counts_per_rank, MPI_FLOAT, 
+	MPI_Gatherv(chunk_c.data, chunk_c_elements, MPI_FLOAT, 
 				gathered_chunk_c, recv_elements_count, displs, MPI_FLOAT, 0, MPI_COMM_WORLD);
 	
 	// Assign these chunks to the elements of C.
 	if (rank == 0) {
-		int proc = 0;
-		int row_in_chunk = 0;
-		int index = 0;
 		for (int i = 0; i < a.rows; ++i) {
 			for (int j = 0; j < b.cols; ++j) {
-				proc = i / rows_per_rank;
-				row_in_chunk = i % rows_per_rank;
-				index = displs[proc] + row_in_chunk * b.cols + j;
-				c->data[i * b.cols + j] = gathered_chunk_c[index];
+				int proc = i / rows_per_rank;
+				int row_in_chunk = i % rows_per_rank;
+				int index = displs[proc] + row_in_chunk * b.cols + j;
+				matrix_set(c, i, j, gathered_chunk_c[index]);
 			}
 		}
 	}
 
 	block_matrix_free(&chunk_a);
 	block_matrix_free(&chunk_c);
+
+	if (rank == 0) {
+        free(recv_elements_count);
+        free(displs);
+        free(gathered_chunk_c);
+    }
 }
