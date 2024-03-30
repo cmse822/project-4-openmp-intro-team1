@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
         return -1;
     }
     
-    fprintf(odata, "%s,%s,%s\n", "matrix size", "GFLOPS/s", "parallel_GFLOP/s", "mpi_GFLOP/s"); // Print header
+    fprintf(odata, "%s,%s,%s,%s\n", "matrix size", "GFLOPS/s", "parallel_GFLOP/s", "mpi_GFLOP/s"); // Print header
 
     for (int N = N_min; N <= N_max; N += interval) {
         
