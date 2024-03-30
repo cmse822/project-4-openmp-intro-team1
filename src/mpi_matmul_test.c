@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 
 	block_matrix_t a, b, c;
-	int size = 6;
+	int size = atoi(argv[1]);
 	a.rows = size;
 	a.cols = size;
 	b.rows = size;
