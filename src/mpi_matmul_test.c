@@ -53,14 +53,14 @@ int main(int argc, char *argv[]) {
 	
 	if (rank == 0) {
 		printf("b = \n");
-		print_matrix(b);
+		//print_matrix(b);
 	}
 
 	mpi_matrix_multiply(a, b, &c, rank, world_size);
 
 	if (rank == 0) {
 		printf("c = \n");
-		print_matrix(c);
+		//print_matrix(c);
 	}
 
 	block_matrix_free(&a);
