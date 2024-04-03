@@ -47,3 +47,13 @@ This message is printed twice, corresponding to the two MPI processes, after the
 
 ## Part 3: Hybrid Parallel Matrix Multiplication
 
+On the `amd-20`, we conducted trials running a hybrid MMM program across four different matrix sizes: `N=10, 50, 100, 200`, under various combinations of processes and threads, and recorded the time consumption. The results are depicted in the heatmap below.
+
+It is observed that while increasing the number of processes or threads tends to reduce the computation time, there exists a threshold for each matrix size beyond which further increases in processes or threads may actually lead to higher time consumption.
+
+Furthermore, there is a notable interaction between the number of threads and processes; a higher number of processes usually means fewer threads are needed, and vice versa. This phenomenon is likely tied to the specific logic implemented in the algorithm. 
+
+In summary, for efficient computation, it is crucial to ensure that the numbers of processes and threads are optimized for the current computation scale, with a rational allocation between the two.
+
+<img src="./part3_1.png" alt="error" width="400"/> <img src="./part3_2.png" alt="error" width="400"/>
+<img src="./part3_3.png" alt="error" width="400"/> <img src="./part3_4.png" alt="error" width="400"/>
