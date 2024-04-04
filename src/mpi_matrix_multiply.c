@@ -2,7 +2,8 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "../include/block_matrix.h"
+//#include "../include/block_matrix.h"
+#include "../include/mpi_matrix_multiply.h"
 
 void mpi_matrix_multiply(block_matrix_t a, block_matrix_t b, block_matrix_t *c, int rank, int world_size){
 	/* Parallelization strategy: 
